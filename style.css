@@ -1,0 +1,91 @@
+* {
+    --black: rgb(25, 25, 25);
+}
+
+body {
+    width: 300px;
+    margin: 20px;
+    background-color: var(--black);
+    color: white;
+}
+
+h1 { 
+    font-size: 1.3rem;
+}
+
+h2 { 
+    font-size: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label { 
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+}
+
+input { 
+    font-size: 0.8rem;
+    color: black;
+    padding: 5px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    margin-bottom: 5px;
+}
+
+#class-options {
+    list-style-type: none;
+    padding: 0;
+    margin-top: -5px;
+}
+
+#class-options li {
+    float: left;
+    margin: 0 5px 0 0;
+    width: 100px;
+    height: 40px;
+    position: relative;
+}
+
+#class-options label, #class-options input { 
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#class-options input[type="radio"] {
+    opacity: 0;
+    z-index: 100;
+    cursor: pointer;
+}
+
+#class-options input[type="radio"]:checked + label {
+    background-color: black;
+    border-color: white;
+}
+
+#class-options label {  
+    padding: 5px;
+    border: 1px solid #CCC;
+    z-index: 90;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 7px;
+}
+
+button { 
+    padding: 5px 20px;
+    border: 1px solid #CCC;
+    z-index: 90;
+    border-radius: 5px;
+    text-align: center;
+    background-color: black;
+    color: white;
+}
