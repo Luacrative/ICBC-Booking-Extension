@@ -7,5 +7,9 @@
       "default_popup": "index.html",
       "default_icon": "icon.png"
     },
-    "permissions": ["storage"]
-  }
+    "host_permissions": ["https://onlinebusiness.icbc.com/webdeas-ui/home"],
+    "permissions": ["storage", "tabs"],
+    "background": {
+      "service_worker": "runner.js"
+    } 
+}  
