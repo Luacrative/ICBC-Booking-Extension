@@ -28,7 +28,7 @@ const loginAuth = async userInfo => {
     return result.headers.get("Authorization");
 }
 
-const getAppointments = async token => {
+const getAppointments = async (userInfo, token) => {
     const location = {};
 
     const result = await fetch(bookingsUrl, {
@@ -39,38 +39,56 @@ const getAppointments = async token => {
         },
         body: JSON.stringify(location)
     });
+    
+    if (result.status != 200)
+        throw new Error(`Request failed with status ${result.status}`);
 
-    return result;
+    return await result.json();
 }
 
 const handleRun = async userInfo => {
-    let lastTab;
-    chrome.tabs.query({ currentWindow: true, active: true }, tabs => {
-        lastTab = tabs[0].id
-    });
+    chrome.tabs.create({ url: homeUrl, active: false }, async ({id}) => {
+        // chrome.tabs.onUpdated.addListener(function listener(updatedId) {
+        // if (updatedId != newTab)
+        // return;
 
-    chrome.tabs.create({ url: homeUrl, active: false }, tab => {
-        const newTab = tab.id;
+        // chrome.tabs.onUpdated.removeListener(listener);
 
-        chrome.tabs.onUpdated.addListener(function listener(updatedId) {
-            if (updatedId != newTab)
-                return;
+        const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxOTQ0OTQ5IiwicHJvZmlsZSI6IntcInVzZXJJZFwiOlwiMTk0NDk0OVwiLFwicm9sZXNcIjpbXCJKb2VQdWJsaWNcIl19IiwiZXhwIjoxNzMyNjA1MjQyLCJpYXQiOjE3MzI2MDM0NDJ9.RvXV7MtCz4RfAWyNnTxzaM35UULpTzsRmrnpy-YiuNc";
+        const appointments = await getAppointments(userInfo, token);
 
-            chrome.tabs.onUpdated.removeListener(listener);
-
-            const auth = loginAuth(userInfo);
-            console.log(auth);
-
-            chrome.tabs.remove(newTab);
-            chrome.tabs.update(lastTab, { active: true });
-        });
-
-        chrome.tabs.update(newTab, { active: true });
+        chrome.tabs.remove(id);
     });
 }
 
+const getToken = async userInfo => {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.create({ url: homeUrl, active: false }, async ({ id }) => {
+            try {
+                const token = await loginAuth(userInfo);
+                chrome.tabs.remove(id);
+
+                resolve(token);
+            } catch (error) {
+                chrome.tabs.remove(id);
+                reject(error);
+            }
+        });
+    });
+};
+
 // Events 
-chrome.runtime.onMessage.addListener((message, sendResponse) => {
-    if (message.action === "makeAPICall")
-        handleRun(message.userInfo);
+chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+    if (message.action === "getToken")
+        (async () => {
+            try {
+                const token = await getToken(message.userInfo);
+                sendResponse({ success: true, token });
+            } catch (error) {
+                console.log("Failed to get token", error);
+                sendResponse({ success: false, error: error.message })
+            }
+        })();
+
+    return true;
 });
