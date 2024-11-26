@@ -29,7 +29,16 @@ const loginAuth = async userInfo => {
 }
 
 const getAppointments = async (userInfo, token) => {
-    const location = {};
+    const location = {
+        "aPosID": 9,
+        "examType": "7-R-1",
+        "examDate": "2024-11-25",
+        "ignoreReserveTime": "false",
+        "prfDaysOfWeek": "[0,1,2,3,4,5,6]",
+        "prfPartsOfDay": "[0,1]",
+        "lastName": userInfo["last-name"],
+        "licenseNumber": userInfo["license-number"]
+    };
 
     const result = await fetch(bookingsUrl, {
         method: "POST",
