@@ -4,11 +4,11 @@ const loginUrl = "https://onlinebusiness.icbc.com/deas-api/v1/webLogin/webLogin"
 const bookingsUrl = "https://onlinebusiness.icbc.com/deas-api/v1/web/getAvailableAppointments";
 
 // Functions
-const loginAuth = async userInfo => {
+const loginAuth = async ({lastName, licenseNumber, icbcKeyword}) => {
     const payload = {
-        drvrLastName: userInfo["last-name"],
-        licenceNumber: userInfo["license-number"],
-        keyword: userInfo["icbc-keyword"]
+        drvrLastName: lastName,
+        licenceNumber: licenseNumber,
+        keyword: icbcKeyword
     };
 
     const result = await fetch(loginUrl, {
@@ -28,7 +28,7 @@ const loginAuth = async userInfo => {
     return result.headers.get("Authorization");
 }
 
-const getAppointments = async (userInfo, token) => {
+const getAppointments = async ({lastName, licenseNumber, token}) => {
     const location = {
         "aPosID": 9,
         "examType": "7-R-1",
@@ -36,8 +36,8 @@ const getAppointments = async (userInfo, token) => {
         "ignoreReserveTime": "false",
         "prfDaysOfWeek": "[0,1,2,3,4,5,6]",
         "prfPartsOfDay": "[0,1]",
-        "lastName": userInfo["last-name"],
-        "licenseNumber": userInfo["license-number"]
+        "lastName": lastName,
+        "licenseNumber": licenseNumber
     };
 
     const result = await fetch(bookingsUrl, {

@@ -9,7 +9,7 @@ const state = {
 };
 
 const userInfo = {};
-const userInfoFields = ["last-name", "license-number", "icbc-keyword", "license-class"];
+const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
 
 // Functions 
 const loadUserInfo = () => {
@@ -22,7 +22,7 @@ const loadUserInfo = () => {
         for (const field of userInfoFields) {
             const value = data.userInfo[field];
 
-            if (field === "license-class")
+            if (field === "licenseClass")
                 form.querySelector(`#${value}`).checked = true;
             else
                 form.querySelector(`#${field}`).setAttribute("value", value);
