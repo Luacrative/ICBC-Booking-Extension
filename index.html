@@ -4,45 +4,52 @@
         <script defer src="script.js"></script>
     </head>
     <body>
-        <h1>ICBC Booking Tracker</h1>
-        
-        <form id="info">
-            <h2>Sign in information</h2>
-
-            <div class="input-group">
-                <label for="lastName">Last name</label>
-                <input id="lastName" name="lastName" placeholder="Last name">
-            </div>
-
-            <div class="input-group">
-                <label for="licenseNumber">License number</label>
-                <input type="password" id="licenseNumber" name="licenseNumber" placeholder="License number" maxlength="8">
-            </div>
+        <div class="main">
+            <h1>ICBC Booking Tracker</h1>
             
-            <div class="input-group">
-                <label for="icbcKeyword">ICBC keyword</label>
-                <input type="password" id="icbcKeyword" name="icbcKeyword" placeholder="Keyword">
-            </div>
+            <section>
+                <div id="info-header">
+                    <span class="expand-arrow flipped" aria-hidden="true"></span>
+                    <h2>Sign-in information</h2>
+                </div>
 
-            <div class="input-group">
-                <label class="no-margin">License class</label>
-                
-                <ul id="class-options">
-                    <li>
-                        <input type="radio" id="class-5" value="class-5" name="licenseClass">
-                        <label for="class-5">Class Five</label>
-                    </li>
+                <form id="info">
+                    <div class="input-group">
+                        <label for="lastName">Last name</label>
+                        <input id="lastName" name="lastName" placeholder="Last name">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="licenseNumber">License number</label>
+                        <input type="password" id="licenseNumber" name="licenseNumber" placeholder="License number" maxlength="8">
+                    </div>
                     
-                    <li>
-                        <input type="radio" id="class-7" value="class-7" name="licenseClass" checked="checked">
-                        <label for="class-7">Class Seven</label>
-                    </li>
-                </ul>
-            </div>
+                    <div class="input-group">
+                        <label for="icbcKeyword">ICBC keyword</label>
+                        <input type="password" id="icbcKeyword" name="icbcKeyword" placeholder="Keyword">
+                    </div>
 
-            <button type="submit" id="save-info">Save information</button>
-        </form>
+                    <div class="input-group">
+                        <label class="no-margin">License class</label>
+                        
+                        <ul id="class-options">
+                            <li>
+                                <input type="radio" id="class-5" value="class-5" name="licenseClass">
+                                <label for="class-5">Class Five</label>
+                            </li>
+                            
+                            <li>
+                                <input type="radio" id="class-7" value="class-7" name="licenseClass" checked="checked">
+                                <label for="class-7">Class Seven</label>
+                            </li>
+                        </ul>
+                    </div>
 
-        <button id="run">Run</button>
+                    <button type="submit" id="save-info">Save information</button>
+                </form>
+            </section>
+
+            <button id="run">Run</button>
+        </div>
     </body>
 </html>

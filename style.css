@@ -1,20 +1,54 @@
 * {
-    --black: rgb(25, 25, 25);
+    --main: rgb(25, 25, 25);
+    --darker: rgb(12, 12, 12);
+    --darkest: rgb(8, 8, 8);
 }
 
 body {
     width: 300px;
-    margin: 20px;
-    background-color: var(--black);
+    margin: 0px;
+    background-color: var(--main);
     color: white;
 }
 
-h1 { 
-    font-size: 1.3rem;
+.main { 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
 }
 
-h2 { 
+h1 {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+h2 {
     font-size: 1rem;
+}
+
+#info-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 12px;
+    background-color: var(--darkest);
+    cursor: pointer;
+}
+
+.expand-arrow {
+    background-image: url("assets/expand-arrow.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    width: 18px;
+    height: 18px;
+    margin-right: 3px;
+}
+
+.flipped {
+    transform: rotate(180deg);
 }
 
 .input-group {
@@ -22,14 +56,20 @@ h2 {
     flex-direction: column;
 }
 
-label { 
+label {
     font-size: 0.8rem;
     margin-bottom: 2px;
 }
 
-input { 
+form {
+    margin: 0;
+    padding: 10px;
+    background-color: var(--darker);
+}
+
+input {
     font-size: 0.8rem;
-    color: black;
+    color: var(--darker);
     padding: 5px;
     border-radius: 5px;
     outline: none;
@@ -51,7 +91,8 @@ input {
     position: relative;
 }
 
-#class-options label, #class-options input { 
+#class-options label,
+#class-options input {
     display: block;
     position: absolute;
     top: 0;
@@ -66,12 +107,12 @@ input {
     cursor: pointer;
 }
 
-#class-options input[type="radio"]:checked + label {
+#class-options input[type="radio"]:checked+label {
     background-color: black;
     border-color: white;
 }
 
-#class-options label {  
+#class-options label {
     padding: 5px;
     border: 1px solid #CCC;
     z-index: 90;
@@ -80,7 +121,7 @@ input {
     margin-top: 7px;
 }
 
-button { 
+button {
     padding: 5px 20px;
     border: 1px solid #CCC;
     z-index: 90;
@@ -88,4 +129,5 @@ button {
     text-align: center;
     background-color: black;
     color: white;
+    cursor: pointer;
 }
