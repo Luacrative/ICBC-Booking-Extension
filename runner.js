@@ -4,7 +4,7 @@ const loginUrl = "https://onlinebusiness.icbc.com/deas-api/v1/webLogin/webLogin"
 const bookingsUrl = "https://onlinebusiness.icbc.com/deas-api/v1/web/getAvailableAppointments";
 
 // Functions
-const loginAuth = async ({lastName, licenseNumber, icbcKeyword}) => {
+const loginAuth = async ({ lastName, licenseNumber, icbcKeyword }) => {
     const payload = {
         drvrLastName: lastName,
         licenceNumber: licenseNumber,
@@ -28,7 +28,7 @@ const loginAuth = async ({lastName, licenseNumber, icbcKeyword}) => {
     return result.headers.get("Authorization");
 }
 
-const getAppointments = async ({lastName, licenseNumber, token}) => {
+const getAppointments = async ({ lastName, licenseNumber, token }) => {
     const location = {
         "aPosID": 9,
         "examType": "7-R-1",
@@ -48,7 +48,7 @@ const getAppointments = async ({lastName, licenseNumber, token}) => {
         },
         body: JSON.stringify(location)
     });
-    
+
     if (result.status != 200)
         throw new Error(`Request failed with status ${result.status}`);
 
@@ -56,15 +56,11 @@ const getAppointments = async ({lastName, licenseNumber, token}) => {
 }
 
 const handleRun = async userInfo => {
-    chrome.tabs.create({ url: homeUrl, active: false }, async ({id}) => {
-        // chrome.tabs.onUpdated.addListener(function listener(updatedId) {
-        // if (updatedId != newTab)
-        // return;
-
-        // chrome.tabs.onUpdated.removeListener(listener);
-
+    chrome.tabs.create({ url: homeUrl, active: false }, async ({ id }) => {
         const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxOTQ0OTQ5IiwicHJvZmlsZSI6IntcInVzZXJJZFwiOlwiMTk0NDk0OVwiLFwicm9sZXNcIjpbXCJKb2VQdWJsaWNcIl19IiwiZXhwIjoxNzMyNjA1MjQyLCJpYXQiOjE3MzI2MDM0NDJ9.RvXV7MtCz4RfAWyNnTxzaM35UULpTzsRmrnpy-YiuNc";
         const appointments = await getAppointments(userInfo, token);
+
+        console.log(appointments);
 
         chrome.tabs.remove(id);
     });
@@ -87,17 +83,29 @@ const getToken = async userInfo => {
 };
 
 // Events 
+const eventHandlers = {
+    "getToken": async ({ userInfo }, sendResponse) => {
+        const token = await getToken(userInfo);
+        sendResponse({ success: true, token });
+    },
+
+    "getAppointments": async ({ userInfo }, sendResponse) => {
+        const appointments = await getAppointments(userInfo);
+        console.log(appointments);
+    }
+}
+
 chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-    if (message.action === "getToken")
-        (async () => {
-            try {
-                const token = await getToken(message.userInfo);
-                sendResponse({ success: true, token });
-            } catch (error) {
-                console.log("Failed to get token", error);
-                sendResponse({ success: false, error: error.message })
-            }
-        })();
+    if (!(message.action in eventHandlers)) {
+        sendResponse({ success: false, error: "No message handler" });
+        return;
+    }
+
+    try {
+        eventHandlers[message.action](message, sendResponse);
+    } catch (error) {
+        sendResponse({ success: false, error: error.message });
+    }
 
     return true;
 });

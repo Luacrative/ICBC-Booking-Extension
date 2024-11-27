@@ -33,17 +33,19 @@ const loadUserInfo = () => {
 const saveUserInfo = async newInfo => {
     chrome.runtime.sendMessage({ 
         action: "getToken",
-        userInfo: newInfo
+        userInfo
     }, response => {
         if (chrome.runtime.lastError)
             console.log("Message failed", chrome.runtime.lastError);
         else if (response && response.success) {
+            console.log("Success");
+
             const token = response.token;
             chrome.storage.local.set({ userInfo: {token, ...newInfo}});
 
             loadUserInfo();
         } else 
-            console.log("Message response error", response?.error);
+            console.log("Failed to save token", response?.error);
         
         state.savingInfo = false;
         saveInfoButton.textContent = "Save information";
@@ -70,6 +72,10 @@ saveInfoButton.addEventListener("click", event => {
 });
 
 runButton.addEventListener("click", () => {
+    chrome.runtime.sendMessage({
+        action: "getAppointments",
+        userInfo
+    })
 });
 
 // Initialize
