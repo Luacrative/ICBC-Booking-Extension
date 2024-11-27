@@ -4,9 +4,13 @@
     --darkest: rgb(8, 8, 8);
 }
 
+html {
+    height: 152px;
+}
+
 body {
     width: 300px;
-    margin: 0px;
+    margin: 0;
     background-color: var(--main);
     color: white;
 }
