@@ -51,7 +51,7 @@ const saveUserInfo = () => {
         return;
 
     state.savingInfo = true;
-    saveInfoButton.textContent = "Saving information";
+    saveInfoButton.textContent = "Saving";
 
     const infoFormData = new FormData(infoForm);
     const newInfo = userInfoFields.reduce((result, field) => {
@@ -61,7 +61,7 @@ const saveUserInfo = () => {
 
     chrome.runtime.sendMessage({
         action: "getToken",
-        userInfo
+        userInfo: newInfo
     }, response => {
         if (chrome.runtime.lastError)
             console.log("Message failed", chrome.runtime.lastError);
@@ -74,7 +74,7 @@ const saveUserInfo = () => {
             console.log("Failed to save token", response?.error);
 
         state.savingInfo = false;
-        saveInfoButton.textContent = "Save information";
+        saveInfoButton.textContent = "Save";
     });
 };
 
