@@ -3,7 +3,8 @@ import SectionManager from "./sectionManager.js";
 
 // Variables 
 const infoForm = document.forms.infoForm;
-const saveInfoButton = infoForm.querySelector("#save-info");
+const infoSaveButton = infoForm.querySelector("#save-info");
+const infoCheckmark = document.querySelector("#info-checkmark");
 
 const filtersForm = document.forms.filtersForm;
 const earliestDateInput = filtersForm.querySelector("#earliestDate");
@@ -21,8 +22,10 @@ const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClas
 const loadUserInfo = firstLoad => {
     chrome.storage.local.get(["userInfo"], data => {
         if (!("userInfo" in data)) {
-            if (firstLoad)
+            if (firstLoad) {
                 SectionManager.expand("info");
+                infoCheckmark.style.display = "none";
+            }
 
             return;
         }
@@ -51,7 +54,9 @@ const saveUserInfo = () => {
         return;
 
     state.savingInfo = true;
-    saveInfoButton.textContent = "Saving";
+    
+    infoSaveButton.textContent = "Saving";
+    infoCheckmark.style.display = "none";
 
     const infoFormData = new FormData(infoForm);
     const newInfo = userInfoFields.reduce((result, field) => {
@@ -74,12 +79,14 @@ const saveUserInfo = () => {
             console.log("Failed to save token", response?.error);
 
         state.savingInfo = false;
-        saveInfoButton.textContent = "Save";
+        
+        infoSaveButton.textContent = "Save";
+        infoCheckmark.style.display = "inline-block";
     });
 };
 
 // Events 
-saveInfoButton.addEventListener("click", event => {
+infoSaveButton.addEventListener("click", event => {
     event.preventDefault();
     saveUserInfo();
 });
