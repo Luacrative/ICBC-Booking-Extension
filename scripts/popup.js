@@ -2,9 +2,12 @@
 import SectionManager from "./sectionManager.js";
 
 // Variables 
-const form = document.forms.info;
+const infoForm = document.forms.infoForm;
+const saveInfoButton = infoForm.querySelector("#save-info");
 
-const saveInfoButton = form.querySelector("#save-info");
+const filtersForm = document.forms.filtersForm;
+const earliestDateInput = filtersForm.querySelector("#earliestDate");
+
 const runButton = document.querySelector("#run");
 
 const state = {
@@ -19,13 +22,13 @@ const loadUserInfo = firstLoad => {
     chrome.storage.local.get(["userInfo"], data => {
         if (!("userInfo" in data)) {
             if (firstLoad)
-                SectionManager.expand("sign-in-info");
+                SectionManager.expand("info");
 
             return;
         }
 
         Object.assign(userInfo, data.userInfo);
-        SectionManager.collapse("sign-in-info");
+        SectionManager.collapse("info");
 
         if (firstLoad)
             SectionManager.expand("filters");
@@ -36,9 +39,9 @@ const loadUserInfo = firstLoad => {
             const value = data.userInfo[field];
 
             if (field === "licenseClass")
-                form.querySelector(`#${value}`).checked = true;
+                infoForm.querySelector(`#${value}`).checked = true;
             else
-                form.querySelector(`#${field}`).setAttribute("value", value);
+                infoForm.querySelector(`#${field}`).setAttribute("value", value);
         }
     });
 };
@@ -50,9 +53,9 @@ const saveUserInfo = () => {
     state.savingInfo = true;
     saveInfoButton.textContent = "Saving information";
 
-    const formData = new FormData(form);
+    const infoFormData = new FormData(infoForm);
     const newInfo = userInfoFields.reduce((result, field) => {
-        result[field] = formData.get(field);
+        result[field] = infoFormData.get(field);
         return result;
     }, {})
 
@@ -86,6 +89,10 @@ runButton.addEventListener("click", () => {
         action: "getAppointments",
         userInfo
     })
+});
+
+earliestDateInput.addEventListener("click", () => {
+    earliestDateInput.showPicker();
 });
 
 // Initialize

@@ -1,21 +1,23 @@
 * {
-    --main: rgb(25, 25, 25);
-    --darker: rgb(12, 12, 12);
-    --darkest: rgb(8, 8, 8);
+    --primary-color: rgb(2, 172, 240);
+    --secondary-color: rgb(20, 20, 20);
+    --primary-hover-color: rgb(0, 117, 226);
 }
 
 html {
-    height: 152px;
+    height: 145px;
 }
 
 body {
     width: 300px;
     margin: 0;
-    background-color: var(--main);
+    background-color: var(--primary-color);
     color: white;
+
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-.main { 
+.main {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -37,7 +39,7 @@ h2 {
     flex-direction: row;
     align-items: center;
     padding-left: 12px;
-    background-color: var(--darkest);
+    background-color: var(--secondary-color);
     cursor: pointer;
 }
 
@@ -60,24 +62,38 @@ h2 {
 }
 
 label {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     margin-bottom: 2px;
 }
 
 .section-body {
     margin: 0;
     padding: 10px;
-    background-color: var(--darker);
+    background-color: var(--secondary-color);
 }
 
 input {
     font-size: 0.8rem;
-    color: var(--darker);
+    color: white;
+    background-color: var(--secondary-color);
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 4px;
+    border: 1px solid grey;
     outline: none;
-    border: none;
     margin-bottom: 5px;
+    transition: border-color 0.2s;
+}
+
+input#earliestDate {
+    cursor: pointer;
+}
+
+input:hover {
+    border-color: white;
+}
+
+input:focus {
+    border-color: var(--primary-color);
 }
 
 #class-options {
@@ -110,27 +126,61 @@ input {
     cursor: pointer;
 }
 
+#class-options li {
+    width: 100%;
+}
+
+#class-options input[type="radio"]+label {
+    transition: 0.1s;
+}
+
+#class-options input[type="radio"]:hover+label {
+    text-decoration: underline;
+    border-color: grey;
+    color: lightgray;
+}
+
 #class-options input[type="radio"]:checked+label {
-    background-color: black;
-    border-color: white;
+    text-decoration: none;
+    background-color: var(--primary-color);
+    border-color: transparent;
+    color: white;
 }
 
 #class-options label {
     padding: 5px;
-    border: 1px solid #CCC;
+    border: 1px solid lightgrey;
     z-index: 90;
     border-radius: 5px;
     text-align: center;
     margin-top: 7px;
 }
 
+.flex-col { 
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row { 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
 button {
-    padding: 5px 20px;
-    border: 1px solid #CCC;
+    padding: 8px 20px;
     z-index: 90;
     border-radius: 5px;
     text-align: center;
-    background-color: black;
+    font-weight: 600;
+    border: 0;
+    background-color: var(--primary-color);
     color: white;
     cursor: pointer;
+}
+
+button:hover {
+    text-decoration: underline;
+    background-color: var(--primary-hover-color);
 }
