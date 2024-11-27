@@ -1,19 +1,19 @@
 <html>
     <head>
         <link rel="stylesheet" href="style.css">
-        <script defer src="script.js"></script>
+        <script defer type="module" src="scripts/popup.js"></script>
     </head>
     <body>
         <div class="main">
             <h1>ICBC Booking Tracker</h1>
             
-            <section>
-                <div id="info-header">
+            <section id="sign-in-info">
+                <div id="info-header" class="section-header">
                     <span class="expand-arrow flipped" aria-hidden="true"></span>
                     <h2>Sign-in information</h2>
                 </div>
 
-                <form id="info">
+                <form id="info" class="section-body">
                     <div class="input-group">
                         <label for="lastName">Last name</label>
                         <input id="lastName" name="lastName" placeholder="Last name">
@@ -47,6 +47,17 @@
 
                     <button type="submit" id="save-info">Save information</button>
                 </form>
+            </section>
+
+            <section id="filters">
+                <div id="filters-header" class="section-header">
+                    <span class="expand-arrow flipped" aria-hidden="true"></span>
+                    <h2>Appointment filters</h2>
+                </div>
+
+                <div class ="section-body">
+                    <h1>Test</h1>
+                </div>
             </section>
 
             <button id="run">Run</button>

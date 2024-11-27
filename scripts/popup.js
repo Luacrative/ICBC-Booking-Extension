@@ -1,9 +1,11 @@
+// Dependencies 
+import SectionManager from "./sectionManager.js";
+
 // Variables 
 const form = document.forms.info;
 
 const saveInfoButton = form.querySelector("#save-info");
 const runButton = document.querySelector("#run");
-const infoHeader = document.querySelector("#info-header");
 
 const state = {
     savingInfo: false
@@ -13,25 +15,21 @@ const userInfo = {};
 const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
 
 // Functions 
-const collapseInfo = () => { 
-    infoHeader.querySelector(".expand-arrow").classList.add("flipped");
-    form.style.display = "none";
-}
-
-const expandInfo = () => {
-    infoHeader.querySelector(".expand-arrow").classList.remove("flipped");
-    form.style.display = "block";
-}
-
 const loadUserInfo = firstLoad => {
     chrome.storage.local.get(["userInfo"], data => {
-        if (!("userInfo" in data))
+        if (!("userInfo" in data)) {
+            if (firstLoad)
+                SectionManager.expand("sign-in-info");
+
             return;
+        }
 
         Object.assign(userInfo, data.userInfo);
-        collapseInfo();
-        
-        if (!firstLoad)
+        SectionManager.collapse("sign-in-info");
+
+        if (firstLoad)
+            SectionManager.expand("filters");
+        else
             return;
 
         for (const field of userInfoFields) {
@@ -45,7 +43,7 @@ const loadUserInfo = firstLoad => {
     });
 };
 
-const saveUserInfo = () => { 
+const saveUserInfo = () => {
     if (state.savingInfo)
         return;
 
@@ -58,7 +56,7 @@ const saveUserInfo = () => {
         return result;
     }, {})
 
-    chrome.runtime.sendMessage({ 
+    chrome.runtime.sendMessage({
         action: "getToken",
         userInfo
     }, response => {
@@ -66,12 +64,12 @@ const saveUserInfo = () => {
             console.log("Message failed", chrome.runtime.lastError);
         else if (response && response.success) {
             const token = response.token;
-            chrome.storage.local.set({ userInfo: {token, ...newInfo}});
+            chrome.storage.local.set({ userInfo: { token, ...newInfo } });
 
             loadUserInfo();
-        } else 
+        } else
             console.log("Failed to save token", response?.error);
-        
+
         state.savingInfo = false;
         saveInfoButton.textContent = "Save information";
     });
@@ -90,16 +88,5 @@ runButton.addEventListener("click", () => {
     })
 });
 
-infoHeader.addEventListener("click", () => {
-    if (form.style.display === "none") {
-        infoHeader.querySelector(".expand-arrow").classList.remove("flipped");
-        form.style.display = "block";
-    } else { 
-        infoHeader.querySelector(".expand-arrow").classList.add("flipped");
-        form.style.display = "none";
-    }
-});
-
 // Initialize
-expandInfo();
 loadUserInfo(true);

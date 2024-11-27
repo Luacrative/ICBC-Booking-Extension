@@ -14,22 +14,21 @@ body {
 .main { 
     display: flex;
     flex-direction: column;
-    gap: 10px;
     width: 100%;
 }
 
 h1 {
     font-size: 1.3rem;
     text-align: center;
-    margin-top: 20px;
-    margin-bottom: 5px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 h2 {
     font-size: 1rem;
 }
 
-#info-header {
+.section-header {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -61,7 +60,7 @@ label {
     margin-bottom: 2px;
 }
 
-form {
+.section-body {
     margin: 0;
     padding: 10px;
     background-color: var(--darker);
