@@ -7,13 +7,13 @@
         <div class="main">
             <h1>ICBC Booking Tracker</h1>
             
-            <section id="sign-in-info">
+            <section id="info">
                 <div id="info-header" class="section-header">
                     <span class="expand-arrow flipped" aria-hidden="true"></span>
                     <h2>Sign-in information</h2>
                 </div>
 
-                <form id="info" class="section-body">
+                <form id="infoForm" class="section-body">
                     <div class="input-group">
                         <label for="lastName">Last name</label>
                         <input id="lastName" name="lastName" placeholder="Last name">
@@ -55,9 +55,12 @@
                     <h2>Appointment filters</h2>
                 </div>
 
-                <div class ="section-body">
-                    <h1>Test</h1>
-                </div>
+                <form id="filtersForm" class="section-body">
+                    <div class="input-group">
+                        <label for="earliestDate">Earliest date</label>
+                        <input type="datetime-local" name="earliestDate" id="earliestDate">
+                    </div>
+                </form>
             </section>
 
             <button id="run" style="display: none">Run</button>
