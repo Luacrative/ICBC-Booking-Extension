@@ -71,11 +71,7 @@ h2 {
 .input-group {
     display: flex;
     flex-direction: column;
-}
-
-label {
-    font-size: 0.9rem;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .section-body {
@@ -108,13 +104,18 @@ input:focus {
     border-color: var(--primary-color);
 }
 
-#class-options {
+label {
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.select-options {
     list-style-type: none;
     padding: 0;
     margin-top: -5px;
 }
 
-#class-options li {
+.select-options li {
     float: left;
     margin: 0 5px 0 0;
     width: 100px;
@@ -122,8 +123,8 @@ input:focus {
     position: relative;
 }
 
-#class-options label,
-#class-options input {
+.select-options label,
+.select-options input {
     display: block;
     position: absolute;
     top: 0;
@@ -132,34 +133,34 @@ input:focus {
     bottom: 0;
 }
 
-#class-options input[type="radio"] {
+.select-options input {
     opacity: 0;
     z-index: 100;
     cursor: pointer;
 }
 
-#class-options li {
+.select-options li {
     width: 100%;
 }
 
-#class-options input[type="radio"]+label {
+.select-options input+label {
     transition: 0.1s;
 }
 
-#class-options input[type="radio"]:hover+label {
+.select-options input:hover+label {
     text-decoration: underline;
     border-color: grey;
     color: lightgray;
 }
 
-#class-options input[type="radio"]:checked+label {
+.select-options input:checked+label {
     text-decoration: none;
     background-color: var(--primary-color);
     border-color: transparent;
     color: white;
 }
 
-#class-options label {
+.select-options label {
     padding: 5px;
     border: 1px solid lightgrey;
     z-index: 90;

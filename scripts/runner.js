@@ -55,17 +55,6 @@ const getAppointments = async ({ lastName, licenseNumber, token }) => {
     return await result.json();
 }
 
-const handleRun = async userInfo => {
-    chrome.tabs.create({ url: homeUrl, active: false }, async ({ id }) => {
-        const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxOTQ0OTQ5IiwicHJvZmlsZSI6IntcInVzZXJJZFwiOlwiMTk0NDk0OVwiLFwicm9sZXNcIjpbXCJKb2VQdWJsaWNcIl19IiwiZXhwIjoxNzMyNjA1MjQyLCJpYXQiOjE3MzI2MDM0NDJ9.RvXV7MtCz4RfAWyNnTxzaM35UULpTzsRmrnpy-YiuNc";
-        const appointments = await getAppointments(userInfo, token);
-
-        console.log(appointments);
-
-        chrome.tabs.remove(id);
-    });
-}
-
 const getToken = async userInfo => {
     return new Promise((resolve, reject) => {
         chrome.tabs.create({ url: homeUrl, active: false }, async ({ id }) => {

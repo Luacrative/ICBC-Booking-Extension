@@ -1,7 +1,10 @@
 // Dependencies 
 import SectionManager from "./sectionManager.js";
+import Locations from "./locations.js";
 
 // Variables 
+const locationOptions = document.querySelector("#location-options");
+
 const infoForm = document.forms.infoForm;
 const infoSaveButton = infoForm.querySelector("#save-info");
 const infoCheckmark = document.querySelector("#info-checkmark");
@@ -19,6 +22,27 @@ const userInfo = {};
 const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
 
 // Functions 
+const createLocation = ({posId, name}) => {
+    const li = document.createElement("li"); 
+    li.classList.add("check-input");
+    li.classList.add("thin-input");
+
+    const input = document.createElement("input");
+    input.setAttribute("type", "checkbox");
+    input.setAttribute("id", posId);
+    input.setAttribute("value", posId);
+    input.setAttribute("name", "locations");
+    input.setAttribute("checked", "checked");
+    
+    const label = document.createElement("label");
+    label.setAttribute("for", posId);
+    label.appendChild(document.createTextNode(name));
+
+    li.appendChild(input); 
+    li.appendChild(label);
+    locationOptions.appendChild(li);
+};
+
 const loadUserInfo = firstLoad => {
     chrome.storage.local.get(["userInfo"], data => {
         if (!("userInfo" in data)) {
@@ -54,7 +78,7 @@ const saveUserInfo = () => {
         return;
 
     state.savingInfo = true;
-    
+
     infoSaveButton.textContent = "Saving";
     infoCheckmark.style.display = "none";
 
@@ -79,7 +103,7 @@ const saveUserInfo = () => {
             console.log("Failed to save token", response?.error);
 
         state.savingInfo = false;
-        
+
         infoSaveButton.textContent = "Save";
         infoCheckmark.style.display = "inline-block";
     });
@@ -103,4 +127,7 @@ earliestDateInput.addEventListener("click", () => {
 });
 
 // Initialize
+for (const location of Locations) 
+    createLocation(location);
+
 loadUserInfo(true);

@@ -36,7 +36,7 @@
                     <div class="input-group">
                         <label class="no-margin">License class</label>
                         
-                        <ul id="class-options" class="flex-row">    
+                        <ul class="select-options flex-row">    
                             <li>
                                 <input type="radio" id="class-5" value="class-5" name="licenseClass">
                                 <label for="class-5">Class Five</label>
@@ -62,7 +62,16 @@
                 <form id="filtersForm" class="section-body">
                     <div class="input-group">
                         <label for="earliestDate">Earliest date</label>
-                        <input type="datetime-local" name="earliestDate" id="earliestDate">
+                        <input type="datetime-local" name="earliestDate" id="earliestDate" value="2024-11-27T20:08">
+                    </div>
+                    <div class="input-group">
+                        <label for="maxDays">Max days from earliest date</label>
+                        <input type="number" name="maxDays" id="maxDays" placeholder="60" value="60">
+                    </div>
+                    <div class="input-group">
+                        <label for="locations">Locations</label>
+
+                        <ul id="location-options" class="select-options"></ul>
                     </div>
                 </form>
             </section>
