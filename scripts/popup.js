@@ -3,7 +3,7 @@ import SectionManager from "./sectionManager.js";
 import Locations from "./locations.js";
 
 // Variables 
-const locationOptions = document.querySelector("#location-options");
+const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
 
 const infoForm = document.forms.infoForm;
 const infoSaveButton = infoForm.querySelector("#save-info");
@@ -11,36 +11,45 @@ const infoCheckmark = document.querySelector("#info-checkmark");
 
 const filtersForm = document.forms.filtersForm;
 const earliestDateInput = filtersForm.querySelector("#earliestDate");
+const maxDaysInput = filtersForm.querySelector("#maxDays");
+const locationOptions = document.querySelector("#location-options");
 
 const runButton = document.querySelector("#run");
 
 const state = {
-    savingInfo: false
+    savingInfo: false,
+    savingFilters: false
 };
 
 const userInfo = {};
-const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
+const filters = {};
 
 // Functions 
-const createLocation = ({posId, name}) => {
-    const li = document.createElement("li"); 
+const createLocation = ({ posId, name }) => {
+    const li = document.createElement("li");
     li.classList.add("check-input");
     li.classList.add("thin-input");
 
     const input = document.createElement("input");
     input.setAttribute("type", "checkbox");
-    input.setAttribute("id", posId);
+    input.setAttribute("id", `pos${posId}`);
     input.setAttribute("value", posId);
     input.setAttribute("name", "locations");
-    input.setAttribute("checked", "checked");
-    
+
     const label = document.createElement("label");
     label.setAttribute("for", posId);
     label.appendChild(document.createTextNode(name));
 
-    li.appendChild(input); 
+    li.appendChild(input);
     li.appendChild(label);
     locationOptions.appendChild(li);
+};
+
+const getCurrentLocalTime = () => {
+    const currentTime = new Date();
+    currentTime.setMinutes(currentTime.getMinutes() - currentTime.getTimezoneOffset());
+
+    return currentTime.toISOString().slice(0, 16);
 };
 
 const loadUserInfo = firstLoad => {
@@ -109,6 +118,44 @@ const saveUserInfo = () => {
     });
 };
 
+const loadFilters = () => {
+    chrome.storage.local.get(["filters"], data => {
+        const loaded = data.filters;
+
+        Object.assign(filters, loaded);
+        SectionManager.collapse("filters");
+
+        earliestDateInput.value = loaded.earliestDate || getCurrentLocalTime();
+        maxDaysInput.value = loaded.maxDays || 60;
+
+        for (const posId of (loaded.locations || Locations.map(location => location.posId))) {
+            const checkbox = filtersForm.querySelector(`#pos${posId}`);
+            checkbox.checked = true;
+        }
+    });
+};
+
+const saveFilters = () => {
+    if (state.savingFilters)
+        return;
+
+    state.savingFilters = true;
+
+    const earliestDate = earliestDateInput.value;
+    const maxDays = maxDaysInput.value;
+    const locations = Locations.filter(({ posId }) => filtersForm.querySelector(`#pos${posId}`).checked).map(({ posId }) => posId);
+
+    chrome.storage.local.set({
+        filters: {
+            earliestDate,
+            maxDays,
+            locations
+        }
+    });
+
+    state.savingFilters = false;
+};
+
 // Events 
 infoSaveButton.addEventListener("click", event => {
     event.preventDefault();
@@ -126,8 +173,11 @@ earliestDateInput.addEventListener("click", () => {
     earliestDateInput.showPicker();
 });
 
+filtersForm.addEventListener("input", saveFilters);
+
 // Initialize
-for (const location of Locations) 
+for (const location of Locations)
     createLocation(location);
 
 loadUserInfo(true);
+loadFilters();
