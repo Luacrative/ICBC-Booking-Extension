@@ -1,6 +1,7 @@
 // Dependencies 
 import SectionManager from "./sectionManager.js";
 import Locations from "./locations.js";
+import getSaved from "./savedData.js";
 
 // Variables 
 const userInfoFields = ["lastName", "licenseNumber", "icbcKeyword", "licenseClass"];
@@ -18,11 +19,8 @@ const runButton = document.querySelector("#run");
 
 const state = {
     savingInfo: false,
-    savingFilters: false
+    savingFilters: false,
 };
-
-const userInfo = {};
-const filters = {};
 
 // Functions 
 const createLocation = ({ posId, name }) => {
@@ -52,34 +50,32 @@ const getCurrentLocalTime = () => {
     return currentTime.toISOString().slice(0, 16);
 };
 
-const loadUserInfo = firstLoad => {
-    chrome.storage.local.get(["userInfo"], data => {
-        if (!("userInfo" in data)) {
-            if (firstLoad) {
-                SectionManager.expand("info");
-                infoCheckmark.style.display = "none";
-            }
-
-            return;
+const loadUserInfo = async firstLoad => {
+    const userInfo = await getSaved("userInfo");
+    if (!userInfo) {
+        if (firstLoad) {
+            SectionManager.expand("info");
+            infoCheckmark.style.display = "none";
         }
 
-        Object.assign(userInfo, data.userInfo);
-        SectionManager.collapse("info");
+        return;
+    }
 
-        if (firstLoad)
-            SectionManager.expand("filters");
+    SectionManager.collapse("info");
+
+    if (firstLoad)
+        SectionManager.expand("filters");
+    else
+        return;
+
+    for (const field of userInfoFields) {
+        const value = userInfo[field];
+
+        if (field === "licenseClass")
+            infoForm.querySelector(`#${value}`).checked = true;
         else
-            return;
-
-        for (const field of userInfoFields) {
-            const value = data.userInfo[field];
-
-            if (field === "licenseClass")
-                infoForm.querySelector(`#${value}`).checked = true;
-            else
-                infoForm.querySelector(`#${field}`).setAttribute("value", value);
-        }
-    });
+            infoForm.querySelector(`#${field}`).setAttribute("value", value);
+    }
 };
 
 const saveUserInfo = () => {
@@ -92,20 +88,22 @@ const saveUserInfo = () => {
     infoCheckmark.style.display = "none";
 
     const infoFormData = new FormData(infoForm);
-    const newInfo = userInfoFields.reduce((result, field) => {
+    const userInfo = userInfoFields.reduce((result, field) => {
         result[field] = infoFormData.get(field);
         return result;
-    }, {})
+    }, {});
+
+    console.log("Running");
 
     chrome.runtime.sendMessage({
         action: "getToken",
-        userInfo: newInfo
+        userInfo
     }, response => {
         if (chrome.runtime.lastError)
             console.log("Message failed", chrome.runtime.lastError);
         else if (response && response.success) {
             const token = response.token;
-            chrome.storage.local.set({ userInfo: { token, ...newInfo } });
+            chrome.storage.local.set({ userInfo: { token, ...userInfo } });
 
             loadUserInfo();
         } else
@@ -118,24 +116,23 @@ const saveUserInfo = () => {
     });
 };
 
-const loadFilters = () => {
-    chrome.storage.local.get(["filters"], data => {
-        const loaded = data.filters;
+const loadFilters = async () => {
+    const filters = await getSaved("filters") || {};
 
-        Object.assign(filters, loaded);
-        SectionManager.collapse("filters");
+    SectionManager.collapse("filters");
 
-        const earliestDate = loaded.earliestDate || getCurrentLocalTime();
-        earliestDateInput.value = earliestDate;
-        earliestDateInput.setAttribute("min", earliestDate); 
-        
-        maxDaysInput.value = loaded.maxDays || 60;
+    const earliestDate = filters.earliestDate || getCurrentLocalTime();
+    earliestDateInput.setAttribute("min", earliestDate);
 
-        for (const posId of (loaded.locations || Locations.map(location => location.posId))) {
-            const checkbox = filtersForm.querySelector(`#pos${posId}`);
-            checkbox.checked = true;
-        }
-    });
+    earliestDateInput.value = earliestDate;
+    maxDaysInput.value = filters.maxDays || 60;
+
+    for (const posId of (filters.locations || Locations.map(location => location.posId))) {
+        const checkbox = filtersForm.querySelector(`#pos${posId}`);
+        checkbox.checked = true;
+    };
+
+    saveFilters();
 };
 
 const saveFilters = () => {

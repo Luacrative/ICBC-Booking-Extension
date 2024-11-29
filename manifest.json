@@ -10,6 +10,7 @@
     "host_permissions": ["https://onlinebusiness.icbc.com/webdeas-ui/home"],
     "permissions": ["storage", "tabs"],
     "background": {
+    "type": "module",
       "service_worker": "scripts/runner.js"
     } 
 }  

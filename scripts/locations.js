@@ -10,7 +10,7 @@ const locations = [
     {
         posId: 11,
         name: "Surrey (78 Avenue)"
-    },    
+    },
     {
         posId: 93,
         name: "Richmond (Lansdowne Centre mall)"

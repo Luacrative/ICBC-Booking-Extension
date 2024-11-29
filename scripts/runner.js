@@ -1,7 +1,16 @@
+// Dependencies
+import getSaved from "./savedData.js";
+
 // Variables
 const homeUrl = "https://onlinebusiness.icbc.com/webdeas-ui/home";
 const loginUrl = "https://onlinebusiness.icbc.com/deas-api/v1/webLogin/webLogin";
 const bookingsUrl = "https://onlinebusiness.icbc.com/deas-api/v1/web/getAvailableAppointments";
+
+let lastInterval;
+let lastLogin = 0;
+
+const sessionLength = 30 * 60;
+const updateInterval = 30 * 1000;
 
 // Functions
 const loginAuth = async ({ lastName, licenseNumber, icbcKeyword }) => {
@@ -11,28 +20,40 @@ const loginAuth = async ({ lastName, licenseNumber, icbcKeyword }) => {
         keyword: icbcKeyword
     };
 
-    const result = await fetch(loginUrl, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Cache-control": "no-cache, no-store",
-            pragma: "no-cache",
-            Expires: "0"
-        },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const result = await fetch(loginUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Cache-control": "no-cache, no-store",
+                pragma: "no-cache",
+                Expires: "0"
+            },
+            body: JSON.stringify(payload)
+        });
 
-    if (result.status != 200)
-        throw new Error(`Request failed with status ${result.status}`);
+        if (!result.ok) {
+            const error = await result.json().catch(() => ({}));
+            return [false, `Error ${result.status}: ${error.message || "Request failed"}`];
+        }
 
-    return result.headers.get("Authorization");
-}
+        const auth = result.headers.get("Authorization");
+        if (!auth)
+            return [false, "No authorization header"];
 
-const getAppointments = async ({ lastName, licenseNumber, token }) => {
+        lastLogin = Date.now();
+
+        return [true, auth];
+    } catch (error) {
+        return [false, error.message || "Error occured"];
+    }
+};
+
+const getAppointments = async ({ lastName, licenseNumber, licenseClass, token }, { posId, earliestDate }) => {
     const location = {
-        "aPosID": 9,
-        "examType": "7-R-1",
-        "examDate": "2024-11-25",
+        "aPosID": posId,
+        "examType": `${licenseClass[6]}-R-1`,
+        "examDate": earliestDate.substr(0, 10),
         "ignoreReserveTime": "false",
         "prfDaysOfWeek": "[0,1,2,3,4,5,6]",
         "prfPartsOfDay": "[0,1]",
@@ -40,47 +61,96 @@ const getAppointments = async ({ lastName, licenseNumber, token }) => {
         "licenseNumber": licenseNumber
     };
 
-    const result = await fetch(bookingsUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": token
-        },
-        body: JSON.stringify(location)
-    });
+    try {
+        const result = await fetch(bookingsUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify(location)
+        });
 
-    if (result.status != 200)
-        throw new Error(`Request failed with status ${result.status}`);
+        if (!result.ok) {
+            const error = await result.json().catch(() => ({}));
+            return [false, `Error ${result.status}: ${error.message || "Request failed"}`];
+        }
 
-    return await result.json();
-}
+        const appointments = await result.json();
+        return [true, appointments];
+    } catch (error) {
+        return [false, error.message || "Error occured"];
+    }
+};
 
 const getToken = async userInfo => {
     return new Promise((resolve, reject) => {
         chrome.tabs.create({ url: homeUrl, active: false }, async ({ id }) => {
-            try {
-                const token = await loginAuth(userInfo);
-                chrome.tabs.remove(id);
+            const [success, token] = await loginAuth(userInfo);
+            chrome.tabs.remove(id);
 
-                resolve(token);
-            } catch (error) {
-                chrome.tabs.remove(id);
-                reject(error);
-            }
+            (success ? resolve : reject)(token);
         });
     });
+};
+
+const update = async () => {
+    const userInfo = await getSaved("userInfo");
+    if (!userInfo)
+        return;
+
+    const filters = await getSaved("filters");
+    if (!filters)
+        return;
+
+    if (((Date.now() - lastLogin) / 1000) >= sessionLength) {
+        try {
+            await getToken(userInfo);
+        } catch (error) {
+            console.log("Authorization failed", error);
+            return;
+        }
+    }
+
+    const checkLocation = async posId => {
+        const [success, appointments] = await getAppointments(userInfo, { posId, ...filters });
+        if (!success)
+            return;
+
+        const earliest = appointments[0];
+    };
+
+    for (const posId of filters.locations)
+        checkLocation(posId);
 };
 
 // Events 
 const eventHandlers = {
     "getToken": async ({ userInfo }, sendResponse) => {
-        const token = await getToken(userInfo);
-        sendResponse({ success: true, token });
+        try {
+            const token = await getToken(userInfo);
+            sendResponse({ success: true, token });
+        } catch (error) {
+            sendResponse({ success: false, error });
+        }
     },
 
-    "getAppointments": async ({ userInfo }, sendResponse) => {
-        const appointments = await getAppointments(userInfo);
-        console.log(appointments);
+    "start": ({ userInfo, filters }) => {
+        if (lastInterval) {
+            clearInterval(lastInterval);
+            lastInterval = undefined;
+        }
+
+        update(userInfo, filters);
+
+        lastInterval = setInterval(update, fetchInterval, userInfo, filters);
+    },
+
+    "stop": () => {
+        if (lastInterval) {
+            clearInterval(lastInterval)
+            lastInterval = undefined;
+        }
     }
 }
 
@@ -98,3 +168,6 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
 
     return true;
 });
+
+// update();
+// setInterval(update, updateInterval);
