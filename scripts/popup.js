@@ -125,7 +125,10 @@ const loadFilters = () => {
         Object.assign(filters, loaded);
         SectionManager.collapse("filters");
 
-        earliestDateInput.value = loaded.earliestDate || getCurrentLocalTime();
+        const earliestDate = loaded.earliestDate || getCurrentLocalTime();
+        earliestDateInput.value = earliestDate;
+        earliestDateInput.setAttribute("min", earliestDate); 
+        
         maxDaysInput.value = loaded.maxDays || 60;
 
         for (const posId of (loaded.locations || Locations.map(location => location.posId))) {
