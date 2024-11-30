@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ICBC Booking Tracker",
-    "description": "Tracks ICBC's available road test dates and notifys you whenever there is an appointment that fits your schedule.",
+    "description": "Tracks ICBC's available road test dates and notifies you whenever there is an appointment that fits your schedule.",
     "version": "1.0",
     "action": {
       "default_popup": "index.html",
