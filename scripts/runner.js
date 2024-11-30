@@ -1,4 +1,5 @@
 // Dependencies
+import Locations from "./locations.js";
 import getSaved from "./savedData.js";
 
 // Variables
@@ -10,7 +11,7 @@ let lastInterval;
 let lastLogin = 0;
 
 const sessionLength = 30 * 60;
-const updateInterval = 30 * 1000;
+const updateInterval = 60 * 1000;
 
 // Functions
 const loginAuth = async ({ lastName, licenseNumber, icbcKeyword }) => {
@@ -26,8 +27,8 @@ const loginAuth = async ({ lastName, licenseNumber, icbcKeyword }) => {
             headers: {
                 "Content-Type": "application/json",
                 "Cache-control": "no-cache, no-store",
-                pragma: "no-cache",
-                Expires: "0"
+                "pragma": "no-cache",
+                "Expires": "0"
             },
             body: JSON.stringify(payload)
         });
@@ -66,6 +67,9 @@ const getAppointments = async ({ lastName, licenseNumber, licenseClass, token },
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Cache-control": "no-cache, no-store",
+                "pragma": "no-cache",
+                "Expires": "0",
                 "Authorization": token
             },
             body: JSON.stringify(location)
@@ -94,6 +98,22 @@ const getToken = async userInfo => {
     });
 };
 
+const getLocationById = posId => {
+    let l = 0;
+    let r = Locations.length - 1;
+
+    while (l <= r) {
+        const m = Math.floor((l + r) / 2);
+
+        if (Locations[m].posId == posId)
+            return Locations[m];
+        else if (Locations[m].posId > posId)
+            r = m - 1;
+        else
+            l = m + 1;
+    }
+};
+
 const update = async () => {
     const userInfo = await getSaved("userInfo");
     if (!userInfo)
@@ -114,10 +134,13 @@ const update = async () => {
 
     const checkLocation = async posId => {
         const [success, appointments] = await getAppointments(userInfo, { posId, ...filters });
-        if (!success)
+        if (!success) {
+            console.log(appointments);
             return;
+        }
 
-        const earliest = appointments[0];
+        const location = getLocationById(posId);
+        console.log(location.name, appointments[0], appointments[1]);
     };
 
     for (const posId of filters.locations)
@@ -169,5 +192,5 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     return true;
 });
 
-// update();
-// setInterval(update, updateInterval);
+update();
+setInterval(update, updateInterval);
