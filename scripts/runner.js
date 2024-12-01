@@ -67,7 +67,7 @@ const getAppointments = async ({ lastName, licenseNumber, licenseClass, token },
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Cache-control": "no-cache, no-store",
+                "Cache-control": "no-cache, no-store", // New Cache-control required
                 "pragma": "no-cache",
                 "Expires": "0",
                 "Authorization": token
@@ -192,5 +192,5 @@ chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
     return true;
 });
 
-update();
-setInterval(update, updateInterval);
+// update();
+// setInterval(update, updateInterval);
